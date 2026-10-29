@@ -5,7 +5,7 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ec.edu.integracion</groupId>
+    <groupId>tomas.ontaneda.integracion</groupId>
     <artifactId>mi-proyecto-camel</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
@@ -63,7 +63,7 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
+            <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.0</version>
             <scope>test</scope>
@@ -87,7 +87,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>ec.edu.integracion.Application</mainClass>
+                    <mainClass>tomas.ontaneda.integracion.Application</mainClass>
                 </configuration>
             </plugin>
         </plugins>
