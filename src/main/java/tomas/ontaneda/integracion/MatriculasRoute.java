@@ -2,6 +2,8 @@ package tomas.ontaneda.integracion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -26,6 +28,15 @@ public class MatriculasRoute extends RouteBuilder {
             .process(this::validar)
 
             .process(this::calcularObligaciones)
+
+            //transferencia de archivos al SF mediante CSV, sin acoplarse a su codigo
+            .setBody(e -> csv("estudiante_id,nombre,concepto,valor_original,descuento,total",
+                    e.getProperty("obligaciones", List.class), ObligacionFinanciera::toCsv))
+            .to("file:output?fileName=obligaciones_financieras.csv&charset=UTF-8")
+
+            .setBody(e -> csv("id_estudiante,nombre,motivo_error",
+                    e.getProperty("rechazados", List.class), MatriculaRechazada::toCsv))
+            .to("file:output?fileName=errores_matriculas.csv&charset=UTF-8")
 
             .log("RESUMEN | Archivo: ${header.CamelFileName} | Leidos: ${exchangeProperty.totalLeidos}"
                     + " | Validos: ${exchangeProperty.validos.size()} | Rechazados: ${exchangeProperty.rechazados.size()}");
@@ -65,5 +76,9 @@ public class MatriculasRoute extends RouteBuilder {
         }
 
         exchange.setProperty("obligaciones", obligaciones);
+    }
+
+    private static <T> String csv(String cabecera, List<T> filas, Function<T, String> fila) {
+        return filas.stream().map(fila).collect(Collectors.joining("\n", cabecera + "\n", "\n"));
     }
 }

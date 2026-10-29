@@ -27,4 +27,9 @@ public record ObligacionFinanciera(
                 descuento,
                 valor.subtract(descuento));
     }
+
+    public String toCsv() {
+        return String.join(",", estudianteId, nombre, concepto,
+                valorOriginal.toPlainString(), descuento.toPlainString(), total.toPlainString());
+    }
 }
