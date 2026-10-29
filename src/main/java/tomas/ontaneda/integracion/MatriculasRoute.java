@@ -25,6 +25,8 @@ public class MatriculasRoute extends RouteBuilder {
 
             .process(this::validar)
 
+            .process(this::calcularObligaciones)
+
             .log("RESUMEN | Archivo: ${header.CamelFileName} | Leidos: ${exchangeProperty.totalLeidos}"
                     + " | Validos: ${exchangeProperty.validos.size()} | Rechazados: ${exchangeProperty.rechazados.size()}");
     }
@@ -48,5 +50,20 @@ public class MatriculasRoute extends RouteBuilder {
 
         exchange.setProperty("validos", validos);
         exchange.setProperty("rechazados", rechazados);
+    }
+
+    private void calcularObligaciones(Exchange exchange) {
+        @SuppressWarnings("unchecked")
+        List<Matricula> validos = exchange.getProperty("validos", List.class);
+        List<ObligacionFinanciera> obligaciones = new ArrayList<>();
+
+        for (Matricula m : validos) {
+            ObligacionFinanciera o = ObligacionFinanciera.desde(m);
+            obligaciones.add(o);
+            log.info("OBLIGACION | id: {} | original: {} | descuento: {} | total: {}",
+                    o.estudianteId(), o.valorOriginal().toPlainString(), o.descuento().toPlainString(), o.total().toPlainString());
+        }
+
+        exchange.setProperty("obligaciones", obligaciones);
     }
 }
